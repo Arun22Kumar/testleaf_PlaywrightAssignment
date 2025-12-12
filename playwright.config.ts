@@ -13,12 +13,16 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './tests',
+  timeout: 30 * 1000,                     // 30 sec timeout for each test
+  expect: {
+    timeout: 5000,                        // 5 sec timeout for expect() assertions
+  },
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 2 : 1,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -32,15 +36,41 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on',
+    viewport: { width: 1280, height: 720 }, // Standard laptop resolution
+    actionTimeout: 10 * 1000,             // Timeout for individual UI actions
+    navigationTimeout: 15 * 1000,         // Timeout for navigation operations
     screenshot: 'on'
   },
 
   /* Configure projects for major browsers */
   projects: [
-    {
+
+  {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
+      use: { browserName:"chromium", 
+        viewport:null, // disable the deafult 1280x720
+        launchOptions:{
+          args:['--start-maximized'],
+        },
+      },
+    }, 
+
+
+     /* {
+      name: 'firefox',
+      use: { browserName:"firefox", 
+        viewport:{ width: 1920, height: 1080 }, // disable the deafult 1280x720
+        launchOptions:{
+          args:['--start-maximized'],
+        }
+}
+} */
+    /* {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'],
+        headless: false
+       },
+    }, */
 
    /*  {
       name: 'firefox',
